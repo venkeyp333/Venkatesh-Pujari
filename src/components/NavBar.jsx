@@ -3,7 +3,7 @@ import { toggleTheme } from "../store/themeSlice";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import lightSwitchSound from '../assets/Audio/light-switch-81967.mp3';
 import { Link } from 'react-scroll';
 import VenkeyLogo from '../assets/Logo/venkey.png';
@@ -11,108 +11,90 @@ import VenkeyLogo from '../assets/Logo/venkey.png';
 export const NavBar = () => {
   const dispatch = useDispatch();
   const darkMode = useSelector((state) => state.theme.darkMode);
-  const [flash, setFlash] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const soundRef = useRef(null);
 
-  const handleToggleTheme = () => {
-    soundRef.current.play();
-    setFlash(true);
+  const sections = ["home", "skills", "experience", "education"];
+
+  const handleToggleTheme = useCallback(() => {
+    // Guard sound playback
+    try { soundRef.current?.play?.(); } catch { /* ignore */ }
     dispatch(toggleTheme());
-    setIsMenuOpen(false); // Close the menu when toggling the theme
-    setTimeout(() => setFlash(false), 300);
-  };
+    setIsMenuOpen(false);
+  }, [dispatch]);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = useCallback(() => setIsMenuOpen(s => !s), []);
 
-  // Close the menu if it is open when the theme changes
   useEffect(() => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
+    setIsMenuOpen(false);
   }, [darkMode]);
 
-  const sections = ["home", "skills", "projects", "education", "hobbies"];
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setIsMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    if (isMenuOpen) document.body.classList.add('overflow-hidden');
+    else document.body.classList.remove('overflow-hidden');
+    return () => { document.removeEventListener('keydown', onKey); document.body.classList.remove('overflow-hidden'); };
+  }, [isMenuOpen]);
 
   return (
-    <nav className={`${darkMode ? "bg-black text-white" : "bg-white text-black"} fixed w-full top-0 left-0 shadow-lg transition-all duration-300 ease-in-out z-50`}>
-      <div className="max-w-7xl mx-auto flex justify-between items-center p-2 md:p-3 lg:p-4"> {/* Responsive padding */}
-        
-        {/* Responsive Logo Image */}
-        <div className="text-xl font-bold">
-          <img
-            src={VenkeyLogo}
-            alt="Venkey Logo"
-            className="h-8 md:h-10 lg:h-12 w-auto" // Adjusted height for responsiveness
-          />
+    <nav role="navigation" aria-label="Main" className={`${darkMode ? 'bg-[#061425] text-white shadow-md' : 'bg-white text-gray-900 shadow-sm'} fixed w-full top-0 left-0 transition-all duration-300 ease-in-out z-50`}>
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-3 md:px-6 lg:px-8 h-16">
+
+        <div className="flex items-center gap-3">
+          <img src={VenkeyLogo} alt="Venkatesh Pujari" className="h-8 w-auto" />
+          <span className="sr-only">Venkatesh Pujari</span>
         </div>
 
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex items-center gap-6">
           {sections.map((section) => (
-            <Link 
-              key={section} 
-              to={section} 
-              smooth={true} 
-              duration={500} 
-              className="hover:underline"
-            >
+            <Link key={section} to={section} smooth duration={500} className="text-sm hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded-md px-2 py-1" role="link">
               {section.charAt(0).toUpperCase() + section.slice(1)}
             </Link>
           ))}
-          {/* Theme Toggle Icon for Desktop */}
-          <button onClick={handleToggleTheme} className="focus:outline-none">
-            <FontAwesomeIcon icon={darkMode ? faSun : faMoon} className="text-lg md:text-xl lg:text-2xl" /> {/* Responsive icon size */}
+
+          <button
+            onClick={handleToggleTheme}
+            aria-pressed={darkMode}
+            aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+            className={`ml-2 p-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 ${darkMode ? 'bg-[#07293b] text-cyan-300 hover:bg-[#09354b]' : 'bg-gray-100 text-cyan-700 hover:bg-gray-200'}`}
+            title={darkMode ? 'Switch to light' : 'Switch to dark'}
+          >
+            <FontAwesomeIcon icon={darkMode ? faSun : faMoon} className="text-lg" aria-hidden="true" />
           </button>
         </div>
 
-        {/* Hamburger Menu */}
         <div className="md:hidden">
           <button
             onClick={toggleMenu}
-            className={`focus:outline-none p-2 rounded-full ${darkMode ? "bg-gradient-to-r from-purple-600 via-pink-700 to-red-600 text-white" : "bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-gray-900"}`}
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400 ${darkMode ? 'bg-[#07293b] text-white' : 'bg-gray-100 text-gray-800'}`}
           >
-            <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} className="text-lg md:text-xl lg:text-2xl" /> {/* Responsive icon size */}
+            <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} className="text-lg" />
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-  <motion.div
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    className={`fixed inset-x-0 mt-2 flex flex-col items-center justify-start md:hidden`}
-  >
-    {/* Translucent background with blur effect */}
-    <div
-      className={`${darkMode ? "bg-gradient-to-r from-purple-600 via-pink-700 to-red-600" : "bg-gray-500"} absolute inset-0 opacity-50 blur-lg`}
-    ></div>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={isMenuOpen ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className={`md:hidden overflow-hidden w-full ${darkMode ? 'bg-[#061425] text-white' : 'bg-white text-gray-900'} shadow-lg`}
+        aria-hidden={!isMenuOpen}
+      >
+        <div className="px-4 pt-3 pb-6 space-y-2">
+          {sections.map((section) => (
+            <Link key={section} to={section} smooth duration={500} className="block text-base py-2 px-2 rounded-md hover:bg-white/5 focus:bg-white/10" onClick={() => setIsMenuOpen(false)}>
+              {section.charAt(0).toUpperCase() + section.slice(1)}
+            </Link>
+          ))}
 
-    {/* Clear content on top of the blurred translucent background */}
-    <div className="relative z-10 flex flex-col items-center space-y-4">
-      {sections.map((section) => (
-        <Link
-          key={section}
-          to={section}
-          smooth={true}
-          duration={500}
-          className="py-2 px-4 text-xl font-semibold text-white hover:text-purple-700 hover:underline transition duration-300 ease-in-out transform hover:scale-105" // Styling for the link
-          onClick={toggleMenu} // Close menu on link click
-        >
-          {section.charAt(0).toUpperCase() + section.slice(1)}
-        </Link>
-      ))}
-
-      {/* Theme Toggle Icon for Mobile */}
-      <button onClick={handleToggleTheme} className="mt-4 focus:outline-none">
-        <FontAwesomeIcon icon={darkMode ? faSun : faMoon} className="text-lg md:text-xl lg:text-2xl" />
-      </button>
-    </div>
-  </motion.div>
-)}
+          <div className="pt-2 border-t border-white/10">
+            <button onClick={handleToggleTheme} className="w-full text-left py-2 px-2 rounded-md hover:bg-white/5">{darkMode ? 'Switch to light' : 'Switch to dark'}</button>
+          </div>
+        </div>
+      </motion.div>
 
       <audio ref={soundRef} src={lightSwitchSound} preload="auto" />
     </nav>

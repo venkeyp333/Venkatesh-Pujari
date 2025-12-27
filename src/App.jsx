@@ -2,26 +2,31 @@ import { Suspense, lazy, useState } from "react";
 import { FaEnvelope } from "react-icons/fa"; // Import an envelope icon for the floating button
 import { NavBar } from "./components/NavBar";
 import { Footer } from "./components/Footer";
+import Banner from "./components/Banner.jsx";
 import "./index.css";
 import { useSelector } from "react-redux"; // Import useSelector
 import ErrorBoundary from "./components/ErrorBoundary"; // Import ErrorBoundary
 
-// Lazy load components
-const Banner = lazy(() => import("./components/Banner.jsx"));
+// Lazy load below-the-fold components
 const Skills = lazy(() => import("./components/Skills"));
-const Projects = lazy(() => import("./components/Projects"));
+const Experience = lazy(() => import("./components/Projects"));
 const Education = lazy(() => import("./components/Education"));
-const ChessSetModel = lazy(() => import("./components/ChessSetModel"));
-
-
 const Contact = lazy(() => import("./components/Contact"));
+
+// Lightweight loading skeleton for perceived performance
+const LoadingSkeleton = () => (
+  <div className="animate-pulse space-y-6 px-6 py-12">
+    <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded" />
+    <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-3/4" />
+    <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
+  </div>
+);
 
 function App() {
   const darkMode = useSelector((state) => state.theme.darkMode); // Get dark mode state from Redux
   const [isContactOpen, setIsContactOpen] = useState(false); // State to toggle Contact component
 
   const toggleContact = () => {
-    console.log("Toggle Contact Clicked"); // Debugging line
     setIsContactOpen(!isContactOpen); // Toggle the Contact component visibility
   };
 
@@ -34,14 +39,13 @@ function App() {
       {/* Sticky Navbar */}
       <NavBar />
 
-      {/* Suspense wrapper with ErrorBoundary for lazy-loaded components */}
+      {/* Eagerly render Banner for above-the-fold content, keep other sections lazy */}
       <ErrorBoundary>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Banner />
+        <Banner />
+        <Suspense fallback={<LoadingSkeleton />}>
           <Skills />
-          <Projects />
+          <Experience />
           <Education />
-          <ChessSetModel />
         </Suspense>
       </ErrorBoundary>
 
