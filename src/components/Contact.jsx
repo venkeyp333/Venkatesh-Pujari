@@ -42,9 +42,13 @@ function Contact() {
       message: values.message,
     };
 
-    const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const serviceID = "service_krd6n9a";
+    const templateID = "template_gxwuc0e";
+    const publicKey = "5V_g0JFaNPlm8BVtM";
+    console.log("serviceID", "templateID", "publicKey");
+    console.log(serviceID, templateID, publicKey);
+
+    
 
     if (!serviceID || !templateID || !publicKey) {
       setStatus({ error: 'Email service is not configured. Please set env variables.' });
