@@ -41,9 +41,19 @@ function Contact() {
       message: values.message,
     };
 
-    emailjs.send("service_krd6n9a", "template_gxwuc0e", emailData, "5V_g0JFaNPlm8BVtM")
-      .then((response) => {
-        console.log('Email sent successfully!', response.status, response.text);
+    const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceID || !templateID || !publicKey) {
+      setStatus({ error: 'Email service is not configured. Please set env variables.' });
+      toast.error('Contact service is not configured.');
+      setSubmitting(false);
+      return;
+    }
+
+    emailjs.send(serviceID, templateID, emailData, publicKey)
+      .then(() => {
         setStatus({ success: 'Your message has been sent successfully!' });
         resetForm();
         toast.success('Your message has been sent successfully!'); // Show toast notification

@@ -9,9 +9,8 @@ import ErrorBoundary from "./components/ErrorBoundary"; // Import ErrorBoundary
 // Lazy load components
 const Banner = lazy(() => import("./components/Banner.jsx"));
 const Skills = lazy(() => import("./components/Skills"));
-const Projects = lazy(() => import("./components/Projects"));
+const Experience = lazy(() => import("./components/Projects"));
 const Education = lazy(() => import("./components/Education"));
-const ChessSetModel = lazy(() => import("./components/ChessSetModel"));
 
 
 const Contact = lazy(() => import("./components/Contact"));
@@ -21,7 +20,6 @@ function App() {
   const [isContactOpen, setIsContactOpen] = useState(false); // State to toggle Contact component
 
   const toggleContact = () => {
-    console.log("Toggle Contact Clicked"); // Debugging line
     setIsContactOpen(!isContactOpen); // Toggle the Contact component visibility
   };
 
@@ -39,9 +37,8 @@ function App() {
         <Suspense fallback={<div>Loading...</div>}>
           <Banner />
           <Skills />
-          <Projects />
+          <Experience />
           <Education />
-          <ChessSetModel />
         </Suspense>
       </ErrorBoundary>
 
