@@ -7,13 +7,18 @@ import 'animate.css';
 import TrackVisibility from 'react-on-screen';
 import emailjs from 'emailjs-com';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone, faEnvelope, faMapMarkerAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faEnvelope, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Contact() {
   const darkMode = useSelector((state) => state.theme.darkMode);
+
+  // Using hard-coded EmailJS keys as requested
+  const SERVICE_ID = 'service_krd6n9a';
+  const TEMPLATE_ID = 'template_gxwuc0e';
+  const PUBLIC_KEY = '5V_g0JFaNPlm8BVtM';
 
   const initialValues = {
     firstName: '',
@@ -42,17 +47,14 @@ function Contact() {
       message: values.message,
     };
 
-    const serviceID = "service_krd6n9a";
-    const templateID = "template_gxwuc0e";
-    const publicKey = "5V_g0JFaNPlm8BVtM";
-    console.log("serviceID", "templateID", "publicKey");
-    console.log(serviceID, templateID, publicKey);
-
-    
+    const serviceID = SERVICE_ID;
+    const templateID = TEMPLATE_ID;
+    const publicKey = PUBLIC_KEY;
 
     if (!serviceID || !templateID || !publicKey) {
-      setStatus({ error: 'Email service is not configured. Please set env variables.' });
-      toast.error('Contact service is not configured.');
+      const hint = 'Create a `.env.local` in the project root with `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, and `VITE_EMAILJS_PUBLIC_KEY` (no quotes), then restart the dev server.';
+      setStatus({ error: `Email service is not configured. ${hint}` });
+      toast.error('Contact service is not configured. Check .env.local');
       setSubmitting(false);
       return;
     }
@@ -72,9 +74,8 @@ function Contact() {
   };
 
   const contactDetails = [
-    { icon: faEnvelope, label: 'Email', value: 'hello@venkatesh.dev', href: 'mailto:hello@venkatesh.dev' },
-    { icon: faPhone, label: 'Phone', value: '+1 (555) 123-4567', href: 'tel:+15551234567' },
-    { icon: faMapMarkerAlt, label: 'Location', value: 'Your City, Country' },
+    { icon: faEnvelope, label: 'Email', value: 'venkateshpujari333@gmail.com', href: 'mailto:venkateshpujari333@gmail.com' },
+    { icon: faPhone, label: 'Phone', value: '9008439330', href: 'tel:9008439330' },
   ];
 
   const socialLinks = [
@@ -93,8 +94,8 @@ function Contact() {
               {/* Left: Contact information card */}
               <div className={`rounded-lg p-8 shadow-lg transform transition hover:scale-[1.01] ${darkMode ? 'bg-gradient-to-br from-indigo-800 to-purple-800 text-white' : 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white'}`}>
                 <img src={logoImg} alt="Logo" className="w-20 h-auto mb-4" />
-                <h3 className="text-2xl font-semibold mb-2">Let's build something great</h3>
-                <p className="mb-6 opacity-90">I'm open to new opportunities, collaborations, and interesting projects. Share a brief message and I'll get back to you as soon as possible.</p>
+                <h3 className="text-2xl font-semibold mb-2">Hi — I'm a Software Developer</h3>
+                <p className="mb-6 opacity-90">I'm actively seeking new opportunities and available for hire. Message me here or contact me directly at <a href="mailto:venkateshpujari333@gmail.com" className="underline">venkateshpujari333@gmail.com</a> or <a href="tel:9008439330" className="underline">9008439330</a>.</p>
 
                 <ul className="space-y-4 mb-6">
                   {contactDetails.map((item) => (
@@ -126,7 +127,7 @@ function Contact() {
               {/* Right: Contact form */}
               <div className={`rounded-lg p-8 shadow-lg ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
                 <h3 className="text-2xl font-semibold mb-1">Send a message</h3>
-                <p className="mb-6 text-sm opacity-80">Or email me directly at <a href="mailto:hello@venkatesh.dev" className="underline">hello@venkatesh.dev</a></p>
+                <p className="mb-6 text-sm opacity-80">Or email me directly at <a href="mailto:venkateshpujari333@gmail.com" className="underline">venkateshpujari333@gmail.com</a></p>
 
                 <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={sendEmail}>
                   {({ isSubmitting, status }) => (
@@ -151,7 +152,10 @@ function Contact() {
                       </div>
 
                       <div className="mt-5 flex items-center gap-3">
-                        <button type="submit" disabled={isSubmitting} className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow transition transform hover:-translate-y-0.5">
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow transition transform hover:-translate-y-0.5">
                           <FontAwesomeIcon icon={faPaperPlane} />
                           <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
                         </button>
